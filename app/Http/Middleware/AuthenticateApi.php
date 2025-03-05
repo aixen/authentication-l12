@@ -3,10 +3,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Exception;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateApi
 {
@@ -18,15 +19,22 @@ class AuthenticateApi
     public function handle(Request $request, Closure $next): Response
     {
         try {
+            if (!$request->bearerToken()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Unauthorized: No token provided',
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+
             $user = JWTAuth::parseToken()->authenticate();
 
             if (!$user) {
                 return response()->json([
                     'error' => true,
-                    'message' => 'Unauthorized: User not found'
+                    'message' => 'Unauthorized: User not found',
                 ], Response::HTTP_UNAUTHORIZED);
             }
-        } catch (Exception $e) {
+        } catch (JWTException $e) {
             return response()->json([
                 'error' => true,
                 'message' => 'Unauthorized: Invalid or expired token',
