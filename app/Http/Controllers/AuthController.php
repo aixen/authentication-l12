@@ -38,15 +38,19 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful.',
             'user' => $result['user'],
-            'token' => $result['token']
+            'token' => $result['token'],
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
 
-    public function getProfile()
+    public function profile()
     {
         $user = JWTAuth::parseToken()->authenticate();
 
-        return response()->json($user);
+        return response()->json([
+            'message' => 'Successfully retrieved user details.',
+            'user' => $user,
+        ]);
     }
 
     public function logout()
@@ -61,8 +65,8 @@ class AuthController extends Controller
         $newToken = JWTAuth::refresh(JWTAuth::getToken());
 
         return response()->json([
-            'access_token' => $newToken,
             'token_type' => 'bearer',
+            'token' => $newToken,
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
