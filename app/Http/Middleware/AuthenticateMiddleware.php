@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthenticateApi
+class AuthenticateMiddleware
 {
     /**
      * Handle an incoming request.
